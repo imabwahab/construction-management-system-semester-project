@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Register &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4">Create your account</h1>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <div id="contractor-fields" class="border-t pt-4 mt-4">
+      <h2 class="font-semibold text-lg mb-1">Contractor details</h2>
+      <p class="text-xs text-gray-500 mb-3">
+        Required only if you selected <strong>Contractor</strong> above. Your account
+        will be reviewed by an admin before you can submit bids.
+      </p>
+      {{ profile_form.as_p }}
+    </div>
+
+    <button type="submit"
+            class="w-full bg-brand hover:bg-brand-dark text-white font-medium py-2 rounded transition">
+      Register
+    </button>
+  </form>
+
+  <p class="text-sm text-gray-600 mt-4">
+    Already have an account? <a href="{% url 'login' %}" class="text-brand hover:underline">Sign in</a>.
+  </p>
+</div>
+
+<script>
+  // Show contractor fields only when the Contractor role is selected.
+  (function () {
+    const section = document.getElementById("contractor-fields");
+    const fields = section.querySelectorAll("input, select, textarea");
+    const radios = document.querySelectorAll('input[name="role"]');
+    function sync() {
+      const selected = document.querySelector('input[name="role"]:checked');
+      const isContractor = selected && selected.value === "CONTRACTOR";
+      section.style.display = isContractor ? "" : "none";
+      // Disable the hidden contractor fields. Otherwise the browser tries to
+      // validate hidden `required` inputs (company_name, experience_years) and
+      // silently blocks the form from submitting for Client sign-ups. Disabled
+      // fields are skipped by validation and excluded from the POST -- which is
+      // correct, since the server only validates the profile for contractors.
+      fields.forEach((f) => { f.disabled = !isContractor; });
+    }
+    radios.forEach((r) => r.addEventListener("change", sync));
+    sync();
+  })();
+</script>
+{% endblock %}

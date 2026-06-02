@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Contractor Dashboard &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Contractor dashboard</h1>
+
+{% if profile and not profile.is_verified %}
+  <div class="bg-yellow-100 text-yellow-800 border border-yellow-200 rounded px-4 py-3 mb-6 text-sm">
+    Your account is <strong>{{ profile.get_verification_status_display }}</strong>.
+    You can submit bids once an admin verifies you.
+  </div>
+{% endif %}
+
+<div class="grid md:grid-cols-2 gap-6">
+  <section>
+    <h2 class="font-semibold text-lg mb-3">Awarded projects</h2>
+    <div class="space-y-3">
+      {% for project in awarded %}
+        <a href="{% url 'project_detail' project.pk %}"
+           class="block bg-white rounded-lg shadow p-4 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="font-medium">{{ project.title }}</span>
+            <span class="text-xs text-gray-500">{{ project.get_status_display }}</span>
+          </div>
+        </a>
+      {% empty %}
+        <p class="text-gray-500 text-sm">No awarded projects yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-semibold text-lg mb-3">My bids</h2>
+    <div class="space-y-3">
+      {% for bid in my_bids %}
+        <a href="{% url 'project_detail' bid.project.pk %}"
+           class="block bg-white rounded-lg shadow p-4 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="font-medium">{{ bid.project.title }}</span>
+            <span class="text-xs px-2 py-1 rounded-full
+              {% if bid.status == 'ACCEPTED' %}bg-green-100 text-green-800
+              {% elif bid.status == 'REJECTED' %}bg-red-100 text-red-800
+              {% else %}bg-yellow-100 text-yellow-800{% endif %}">{{ bid.get_status_display }}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">{{ bid.bid_amount }} &middot; {{ bid.proposed_timeline_days }} days</p>
+        </a>
+      {% empty %}
+        <p class="text-gray-500 text-sm">You haven't placed any bids yet.
+          <a href="{% url 'project_list' %}" class="text-brand hover:underline">Browse projects</a>.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

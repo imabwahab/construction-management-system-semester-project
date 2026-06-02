@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4">Edit profile</h1>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <h2 class="font-semibold">Account</h2>
+    {{ user_form.as_p }}
+
+    {% if profile_form %}
+      <h2 class="font-semibold border-t pt-4 mt-4">Contractor profile</h2>
+      {{ profile_form.as_p }}
+    {% endif %}
+
+    <button type="submit"
+            class="bg-brand hover:bg-brand-dark text-white font-medium px-5 py-2 rounded transition">
+      Save changes
+    </button>
+  </form>
+</div>
+{% endblock %}

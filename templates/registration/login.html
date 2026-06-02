@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4">Sign in</h1>
+
+  {% if form.errors %}
+    <p class="bg-red-100 text-red-800 border border-red-200 rounded px-3 py-2 text-sm mb-4">
+      Your username and password didn't match. Please try again.
+    </p>
+  {% endif %}
+
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit"
+            class="w-full bg-brand hover:bg-brand-dark text-white font-medium py-2 rounded transition">
+      Sign in
+    </button>
+  </form>
+
+  <p class="text-sm text-gray-600 mt-4">
+    No account? <a href="{% url 'register' %}" class="text-brand hover:underline">Register here</a>.
+  </p>
+</div>
+{% endblock %}

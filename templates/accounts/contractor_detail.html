@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile.company_name|default:contractor.username }} &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-3xl mx-auto">
+  <div class="flex items-start justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">{{ profile.company_name|default:contractor.username }}</h1>
+      <p class="text-sm text-gray-500">Contractor &middot; {{ contractor.username }}</p>
+    </div>
+    {% if profile %}
+      <span class="text-sm px-3 py-1 rounded-full
+        {% if profile.is_verified %}bg-green-100 text-green-800
+        {% elif profile.verification_status == 'REJECTED' %}bg-red-100 text-red-800
+        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+        {{ profile.get_verification_status_display }}
+      </span>
+    {% endif %}
+  </div>
+
+  {% if profile %}
+    <dl class="grid sm:grid-cols-2 gap-4 mt-6 text-sm">
+      <div><dt class="text-gray-500">Experience</dt><dd>{{ profile.experience_years }} year{{ profile.experience_years|pluralize }}</dd></div>
+      <div><dt class="text-gray-500">License #</dt><dd>{{ profile.license_number|default:"—" }}</dd></div>
+      <div><dt class="text-gray-500">Average rating</dt><dd>{{ profile.rating_average }} / 5</dd></div>
+    </dl>
+    {% if profile.biography %}
+      <div class="mt-4">
+        <h2 class="font-semibold mb-1">About</h2>
+        <p class="text-sm text-gray-700 whitespace-pre-line">{{ profile.biography }}</p>
+      </div>
+    {% endif %}
+  {% else %}
+    <p class="text-gray-500 mt-4">This contractor has not completed their profile yet.</p>
+  {% endif %}
+
+  <div class="mt-8 border-t pt-6">
+    <h2 class="font-semibold text-lg mb-3">Reviews</h2>
+    {% for review in reviews %}
+      <div class="border rounded p-3 mb-3">
+        <div class="flex items-center justify-between">
+          <span class="font-medium">{{ review.rating }} / 5</span>
+          <span class="text-xs text-gray-400">{{ review.created_at|date:"M j, Y" }}</span>
+        </div>
+        {% if review.comment %}<p class="text-sm text-gray-700 mt-1">{{ review.comment }}</p>{% endif %}
+        <p class="text-xs text-gray-400 mt-1">by {{ review.client.username }}</p>
+      </div>
+    {% empty %}
+      <p class="text-sm text-gray-500">No reviews yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
