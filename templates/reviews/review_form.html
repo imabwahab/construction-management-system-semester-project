@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Leave a Review &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-1">Review</h1>
+  <p class="text-sm text-gray-500 mb-4">
+    {{ project.title }} &middot; contractor {{ project.awarded_contractor.username }}
+  </p>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit"
+            class="bg-brand hover:bg-brand-dark text-white font-medium px-5 py-2 rounded transition">
+      Submit review
+    </button>
+  </form>
+</div>
+{% endblock %}
