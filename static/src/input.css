@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Style Django-rendered form widgets globally (no per-field classes needed). */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="file"],
+  select,
+  textarea {
+    @apply w-full border border-gray-300 rounded px-3 py-2 text-sm
+           focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand;
+  }
+
+  label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  .errorlist {
+    @apply list-none p-0 m-0 text-sm text-red-600 mb-1;
+  }
+
+  .helptext {
+    @apply block text-xs text-gray-500 mt-1;
+  }
+}
