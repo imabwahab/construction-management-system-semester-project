@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}BuildBid &mdash; Connect Clients with Contractors{% endblock %}
+
+{% block content %}
+<section class="text-center py-12">
+  <h1 class="text-4xl font-bold text-brand-dark mb-4">
+    Find the right contractor for your construction project
+  </h1>
+  <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+    Clients post projects, verified contractors submit competitive bids, and you
+    award the job to the best fit &mdash; with transparent reviews to build trust.
+  </p>
+  <div class="flex items-center justify-center gap-4">
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}"
+         class="bg-brand hover:bg-brand-dark text-white font-medium px-6 py-3 rounded-lg transition">
+        Go to dashboard
+      </a>
+    {% else %}
+      <a href="{% url 'register' %}"
+         class="bg-brand hover:bg-brand-dark text-white font-medium px-6 py-3 rounded-lg transition">
+        Get started
+      </a>
+      <a href="{% url 'login' %}"
+         class="bg-white border border-brand text-brand font-medium px-6 py-3 rounded-lg hover:bg-blue-50 transition">
+        Sign in
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="grid md:grid-cols-3 gap-6 mt-8">
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="font-semibold text-lg mb-2">1. Post a project</h2>
+    <p class="text-sm text-gray-600">Clients describe the work, budget, location, and deadline.</p>
+  </div>
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="font-semibold text-lg mb-2">2. Compare bids</h2>
+    <p class="text-sm text-gray-600">Verified contractors bid; clients compare price, timeline, and ratings.</p>
+  </div>
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="font-semibold text-lg mb-2">3. Award &amp; review</h2>
+    <p class="text-sm text-gray-600">Award the job, track it to completion, then leave a review.</p>
+  </div>
+</section>
+{% endblock %}
