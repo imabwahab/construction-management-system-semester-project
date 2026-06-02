@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Project &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4">Post a new project</h1>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit"
+            class="bg-brand hover:bg-brand-dark text-white font-medium px-5 py-2 rounded transition">
+      Post project
+    </button>
+  </form>
+</div>
+{% endblock %}

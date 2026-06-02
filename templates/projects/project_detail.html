@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} &mdash; BuildBid{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-2xl font-bold">{{ project.title }}</h1>
+        <p class="text-sm text-gray-500">{{ project.category.name }} &middot; posted by {{ project.client.username }}</p>
+      </div>
+      <span class="text-sm px-3 py-1 rounded-full
+        {% if project.status == 'OPEN' %}bg-green-100 text-green-800
+        {% elif project.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
+        {% elif project.status == 'COMPLETED' %}bg-gray-200 text-gray-700
+        {% else %}bg-red-100 text-red-800{% endif %}">
+        {{ project.get_status_display }}
+      </span>
+    </div>
+
+    <p class="text-gray-700 mt-4 whitespace-pre-line">{{ project.description }}</p>
+
+    <dl class="grid sm:grid-cols-2 gap-4 mt-6 text-sm">
+      <div><dt class="text-gray-500">Location</dt><dd>{{ project.location }}</dd></div>
+      <div><dt class="text-gray-500">Budget</dt><dd>{{ project.budget_min }} – {{ project.budget_max }}</dd></div>
+      <div><dt class="text-gray-500">Deadline</dt><dd>{{ project.deadline|date:"M j, Y" }}</dd></div>
+      <div><dt class="text-gray-500">Posted</dt><dd>{{ project.created_at|date:"M j, Y" }}</dd></div>
+    </dl>
+
+    {% if project.awarded_contractor %}
+      <p class="mt-4 text-sm bg-blue-50 border border-blue-100 rounded px-3 py-2">
+        Awarded to
+        <a href="{% url 'contractor_detail' project.awarded_contractor.pk %}" class="text-brand hover:underline">
+          {{ project.awarded_contractor.username }}
+        </a>
+      </p>
+    {% endif %}
+  </div>
+
+  {# Contextual actions: bidding, awarding, completion, confirmation. #}
+  {% if can_bid %}
+    <div class="bg-white rounded-lg shadow p-6 mt-6">
+      <h2 class="font-semibold text-lg mb-3">Submit a bid</h2>
+      <form method="post" action="{% url 'bid_create' project.pk %}" class="space-y-3">
+        {% csrf_token %}
+        {{ bid_form.as_p }}
+        <button type="submit" class="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded text-sm">
+          Submit bid
+        </button>
+      </form>
+    </div>
+  {% elif user_bid %}
+    <p class="bg-blue-50 border border-blue-100 rounded px-4 py-3 mt-6 text-sm">
+      You bid <strong>{{ user_bid.bid_amount }}</strong> ({{ user_bid.proposed_timeline_days }} days) &middot;
+      status: {{ user_bid.get_status_display }}.
+    </p>
+  {% endif %}
+
+  {% if is_awarded_contractor and project.status == 'IN_PROGRESS' %}
+    <form method="post" action="{% url 'mark_completed' project.pk %}" class="mt-6">
+      {% csrf_token %}
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
+        Mark project as completed
+      </button>
+    </form>
+  {% endif %}
+
+  {% if is_owner and project.status == 'COMPLETED' and not project.completion_confirmed %}
+    <form method="post" action="{% url 'confirm_completion' project.pk %}" class="mt-6">
+      {% csrf_token %}
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
+        Confirm completion
+      </button>
+    </form>
+  {% endif %}
+
+  {% if project.status == 'COMPLETED' and project.completion_confirmed %}
+    {% if project.review %}
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h2 class="font-semibold text-lg mb-1">Your review</h2>
+        <p class="text-sm">{{ project.review.rating }} / 5</p>
+        {% if project.review.comment %}<p class="text-sm text-gray-700 mt-1">{{ project.review.comment }}</p>{% endif %}
+      </div>
+    {% elif is_owner %}
+      <a href="{% url 'review_create' project.pk %}"
+         class="inline-block mt-6 bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded text-sm">
+        Leave a review
+      </a>
+    {% endif %}
+  {% endif %}
+
+  <div class="bg-white rounded-lg shadow p-6 mt-6">
+    <h2 class="font-semibold text-lg mb-3">Bids ({{ bids|length }})</h2>
+    {% for bid in bids %}
+      <div class="border rounded p-3 mb-3 flex items-center justify-between">
+        <div>
+          <a href="{% url 'contractor_detail' bid.contractor.pk %}" class="font-medium text-brand hover:underline">
+            {{ bid.contractor.contractor_profile.company_name|default:bid.contractor.username }}
+          </a>
+          <p class="text-xs text-gray-500">
+            {{ bid.bid_amount }} &middot; {{ bid.proposed_timeline_days }} days &middot;
+            {{ bid.get_status_display }}
+          </p>
+        </div>
+        {% if is_owner and project.is_open %}
+          <form method="post" action="{% url 'award_bid' bid.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="bg-brand hover:bg-brand-dark text-white px-3 py-1.5 rounded text-xs">
+              Award
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="text-sm text-gray-500">No bids yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
